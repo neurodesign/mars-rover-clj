@@ -24,7 +24,7 @@
     (is (= {:x 1 :y 2 :heading :S} ((comp turn-left turn-left move-forward-once turn-left move-forward-once turn-right move-forward-once) {:x 0 :y 0 :heading :N}))))
 
 (deftest test-map-limits-cycles
-  (testing "moving out of the map gets up on the opposite side")
+  (testing "moving out of the map gets you on the opposite side")
   (is (= {:x 19 :y 0 :heading :N} (move-forward-once {:x 19 :y 19 :heading :N})))
   (is (= {:x 0 :y 19 :heading :E} (move-forward-once {:x 19 :y 19 :heading :E})))
   (change-map-size {:width 100 :height 100})
