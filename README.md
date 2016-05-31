@@ -1,14 +1,7 @@
-# app
+# Mars kata without conditions
 
-A Clojure library designed to ... well, that part is up to you.
+The mars rover kata, implemented in Clojure, without conditions.
 
-## Usage
+## Running the tests
 
-FIXME
-
-## License
-
-Copyright © 2016 FIXME
-
-Distributed under the Eclipse Public License either version 1.0 or (at
-your option) any later version.
+        lein test
