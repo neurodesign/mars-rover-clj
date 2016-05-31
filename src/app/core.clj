@@ -1,5 +1,10 @@
 (ns app.core)
 
+(def map-size (atom {:width 20 :height 20}))
+
+(defn change-map-size [new-size]
+  (reset! map-size new-size))
+
 (def turns
   [:N :E :S :W])
 
@@ -20,8 +25,8 @@
 
 (defn- move-forward-n [n rover]
   (-> rover
-    (assoc-in [:x] (+ (:x rover) (* (first (transforms (:heading rover))) n)))
-    (assoc-in [:y] (+ (:y rover) (* (last (transforms (:heading rover))) n)))))
+    (assoc-in [:x] (mod (+ (:x rover) (* (first (transforms (:heading rover))) n)) (:width @map-size)))
+    (assoc-in [:y] (mod (+ (:y rover) (* (last (transforms (:heading rover))) n)) (:height @map-size)))))
 
 (defn move-forward-once [rover]
   (move-forward-n 1 rover))
