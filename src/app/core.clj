@@ -1,9 +1,14 @@
 (ns app.core)
 
-(def map-size (atom {:width 20 :height 20}))
-
-(defn change-map-size [new-size]
-  (reset! map-size new-size))
+(def rover-map (atom [[0 0 0]
+                      [0 0 0]
+                      [0 0 0]]))
+(defn define-map! [new-map]
+  (reset! rover-map new-map))
+(defn map-height [m]
+  (count m))
+(defn map-width [m]
+  (count (first m)))
 
 (def turns
   [:N :E :S :W])
@@ -23,13 +28,41 @@
    :S [0 -1]
    :W [-1 0]})
 
-(defn- move-forward-n [n rover]
+(defn- next-position-without-obstacles [multiplier rover]
   (-> rover
-    (assoc-in [:x] (mod (+ (:x rover) (* (first (transforms (:heading rover))) n)) (:width @map-size)))
-    (assoc-in [:y] (mod (+ (:y rover) (* (last (transforms (:heading rover))) n)) (:height @map-size)))))
+      (assoc-in [:x] (mod (+ (:x rover) (* (first (transforms (:heading rover))) multiplier)) (map-width @rover-map)))
+      (assoc-in [:y] (mod (+ (:y rover) (* (last (transforms (:heading rover))) multiplier)) (map-height @rover-map)))))
 
-(defn move-forward-once [rover]
-  (move-forward-n 1 rover))
+(defn get-map-value [m x y]
+  "returns a map value from x and y"
+  (nth (nth m (- (count m) y 1)) x))
 
-(defn move-forward-many [n]
-  (fn [rover] (move-forward-n n rover)))
+(defn get-rover-map-value [rover]
+  "returns the map value for the given rover position"
+  (get-map-value @rover-map (:x rover) (:y rover)))
+
+(defn get-move-cancelling-multiplier [v]
+  "returns 0 if v = 1, returns 1 if v = 0"
+  (Math/abs (- 1 v)))
+
+(defn get-obstacle-multiplier [rover]
+  "returns 0 if on an obstacle, returns 1 if not"
+  (Math/abs (- 1 (get-rover-map-value rover))))
+
+(defn move-with-obstacles [fb-multiplier rover]
+  (let [next-position-without-obstacles (next-position-without-obstacles fb-multiplier rover)]
+    (-> rover
+        (assoc-in [:x] (+
+                         (* (:x next-position-without-obstacles) (get-obstacle-multiplier next-position-without-obstacles))
+                         (* (:x rover) (get-move-cancelling-multiplier (get-obstacle-multiplier next-position-without-obstacles)))))
+        (assoc-in [:y] (+
+                         (* (:y next-position-without-obstacles) (get-obstacle-multiplier next-position-without-obstacles))
+                         (* (:y rover) (get-move-cancelling-multiplier (get-obstacle-multiplier next-position-without-obstacles))))))))
+
+(defn move-forward [rover]
+  "moves forward"
+  (move-with-obstacles 1 rover))
+
+(defn move-backward [rover]
+  "moves forward"
+  (move-with-obstacles -1 rover))
