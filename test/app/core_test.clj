@@ -2,8 +2,6 @@
   (:require [clojure.test :refer :all]
             [app.core :refer :all]))
 
-
-
 (deftest test-map-dimensions
   (testing "map width"
     (let [m [[0 0 0]
@@ -66,9 +64,9 @@
                 [0 1 0]
                 [0 0 0]])
   (testing "prevents moving if obstacle ahead"
-    (is (= {:x 1 :y 0 :heading :N} (move-with-obstacles 1 {:x 1 :y 0 :heading :N})))
-    (is (= {:x 0 :y 1 :heading :E} (move-with-obstacles 1 {:x 0 :y 1 :heading :E})))
+    (is (= {:x 1 :y 0 :heading :N} (move-forward {:x 1 :y 0 :heading :N})))
+    (is (= {:x 0 :y 1 :heading :E} (move-forward {:x 0 :y 1 :heading :E})))
   (testing "moves if no obstacle ahead")
-    (is (= {:x 0 :y 1 :heading :N} (move-with-obstacles 1 {:x 0 :y 0 :heading :N}))))
+    (is (= {:x 0 :y 1 :heading :N} (move-forward  {:x 0 :y 0 :heading :N}))))
   (testing "obstacles on the other side of the map"
-    (is (= {:x 1 :y 0 :heading :N} (move-with-obstacles -1 {:x 1 :y 0 :heading :N})))))
+    (is (= {:x 1 :y 0 :heading :N} (move-backward {:x 1 :y 0 :heading :N})))))
